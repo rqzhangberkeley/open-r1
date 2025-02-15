@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 import datasets
 import torch
 import transformers
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
 from transformers import set_seed
 from transformers.trainer_utils import get_last_checkpoint
 
@@ -140,11 +140,11 @@ def main(script_args, training_args, model_args):
         logger.info(f"Checkpoint detected, resuming training at {last_checkpoint=}.")
 
     # Load the dataset
-    dataset = load_dataset(script_args.dataset_name, name=script_args.dataset_config)
+    dataset = load_from_disk(script_args.dataset_name)
 
     # Get reward functions
     REWARD_FUNCS_REGISTRY = {
-        "accuracy": accuracy_reward,
+        "accuracy": accuracy_reward, # RZ: They use math-verify to verify the correctness of the results. Seems this does not need to call openai api.
         "format": format_reward,
         "reasoning_steps": reasoning_steps_reward,
         "cosine": get_cosine_scaled_reward(
@@ -184,7 +184,8 @@ def main(script_args, training_args, model_args):
         trust_remote_code=model_args.trust_remote_code,
         attn_implementation=model_args.attn_implementation,
         torch_dtype=torch_dtype,
-        use_cache=False if training_args.gradient_checkpointing else True,
+        use_cache=False if training_args.gradient_checkpointing else True, # RZ: By default the gradient_checkpointing is true, so the use_cache is False.
+        cache_dir="../../../../../scratch/gpfs/gt2974/openR1/cache"
     )
     training_args.model_init_kwargs = model_kwargs
 
@@ -248,6 +249,7 @@ def main(script_args, training_args, model_args):
     #############
     # push to hub
     #############
+    # Currently, we do not push anything to hub.
     if training_args.push_to_hub:
         logger.info("Pushing to hub...")
         trainer.push_to_hub(**kwargs)

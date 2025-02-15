@@ -35,7 +35,7 @@ overwrite_output_dir: true
 packing: true
 per_device_eval_batch_size: 4
 per_device_train_batch_size: 2
-push_to_hub: true
+push_to_hub: false # RZ: we do not push the model or dat to hub.
 report_to:
 - wandb
 save_strategy: "no"

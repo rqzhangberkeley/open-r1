@@ -1,15 +1,15 @@
 # Model arguments
-model_name_or_path: Qwen/Qwen2.5-1.5B-Instruct
+model_name_or_path: ../../../../../scratch/gpfs/gt2974/S1/QWen-2.5-1.5B-Instruct
 model_revision: main
 torch_dtype: bfloat16
 attn_implementation: flash_attention_2
 
 # Data training arguments
-dataset_name: AI-MO/NuminaMath-TIR
+dataset_name: ../../../../../scratch/gpfs/gt2974/S1/datasets/AI-MO/NuminaMath-TIR
 dataset_configs:
 - all
 # Num processes is less by 1 as vLLM is using 1 GPU
-num_processes: 7
+num_processes: 3
 
 # GRPO trainer config
 bf16: true
@@ -19,11 +19,11 @@ vllm_gpu_memory_utilization: 0.7
 do_eval: true
 eval_strategy: steps
 eval_steps: 100
-gradient_accumulation_steps: 16
-gradient_checkpointing: true
+gradient_accumulation_steps: 40
+gradient_checkpointing: true # RZ: when this is True, the usse_cache is false in 
 gradient_checkpointing_kwargs:
   use_reentrant: false
-hub_model_id: Qwen2.5-1.5B-Open-R1-GRPO
+hub_model_id: QWen-2.5-1.5B-Instruct
 hub_strategy: every_save
 learning_rate: 2.0e-05
 log_level: info
@@ -35,13 +35,12 @@ max_completion_length: 1024
 max_steps: -1
 num_generations: 2
 num_train_epochs: 1
-output_dir: data/Qwen2.5-1.5B-Open-R1-GRPO
+output_dir: ../../../../../scratch/gpfs/gt2974/openR1/QWen-2.5-1.5B-Open-R1-GRPO
 overwrite_output_dir: true
 per_device_eval_batch_size: 4   
 per_device_train_batch_size: 2
-push_to_hub: true
-report_to:
-- wandb
+push_to_hub: false # RZ: we do not push the model or dat to hub.
+report_to: none
 save_strategy: "no"
 seed: 42
 warmup_ratio: 0.1
